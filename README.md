@@ -16,8 +16,8 @@ The system automatically classifies queries into three modes:
 ├── search_engine.py      # Search engine logic (dictionary + BM25)
 ├── index.html            # User interface (frontend)
 ├── requirments.txt       # Python dependencies
-├── Simple_wiki_data.csv  # Search dataset (Simple English Wikipedia)
-├── bm25_model.pkl        # Pre-trained BM25 index base on csv data  for fast search
+├── Simple_wiki_data.csv  # Search dataset (Simple English Wikipedia) (i zipped it)
+├── bm25_model.pkl        # Pre-trained BM25 index base on csv data  for fast search (it will display when you run code)
 ├── file_id_SPW           # this is file id of SimpleWiki, you can take it on SimpleWiki
 ├── crawler_data.ipynb    # this is code to crawl data and clean it
 ```
@@ -90,4 +90,4 @@ The dataset comes from **Simple English Wikipedia**, processed into:
 - `bm25_model.pkl` – pre-built BM25 index for faster search.
 ## Note
 - If you clone this repo, pls change the path to csv file on you computer to run it work, the path in app.py.
-- If you run the app.py for the first time, it's may take a while (about 2-3m) to run because the data file is heavy 
+- If you run the app.py for the first time, it's may take a while (about 2-3m) to run and create bm25_model.pkl because the data file is heavy 
