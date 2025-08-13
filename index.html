@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechWiki - Smart Search Engine</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+            color: #e0e6ed;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.1) 0%, transparent 50%);
+        }
+
+        .circuit-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        .circuit-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .circuit-line:nth-child(1) {
+            top: 20%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            animation-delay: 0s;
+        }
+
+        .circuit-line:nth-child(2) {
+            top: 0;
+            left: 30%;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(180deg, transparent, #ff6b9d, transparent);
+            animation-delay: 1s;
+        }
+
+        .circuit-line:nth-child(3) {
+            top: 60%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            animation-delay: 2s;
+        }
+
+        .circuit-line:nth-child(4) {
+            top: 0;
+            right: 20%;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(180deg, transparent, #7c77c6, transparent);
+            animation-delay: 1.5s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Header */
+        .header {
+            background: rgba(15, 15, 25, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(120, 119, 198, 0.2);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00d4ff, #ff6b9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-info {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            color: #e0e6ed;
+            font-size: 0.9rem;
+        }
+
+        .search-mode-indicator {
+            background: rgba(0, 212, 255, 0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Main container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        /* Search section */
+        .search-section {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .search-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #00d4ff, #ff6b9d, #7c77c6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .search-subtitle {
+            font-size: 1.2rem;
+            color: #a0a6b0;
+            margin-bottom: 2rem;
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            background: rgba(20, 20, 30, 0.8);
+            border: 2px solid rgba(120, 119, 198, 0.3);
+            border-radius: 50px;
+            color: #e0e6ed;
+            outline: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-input:focus {
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .search-input::placeholder {
+            color: #6b7280;
+        }
+
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(20, 20, 30, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(120, 119, 198, 0.3);
+            border-radius: 15px;
+            margin-top: 0.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 50;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid rgba(120, 119, 198, 0.1);
+        }
+
+        .suggestion-item:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Search info panel */
+        .search-info-panel {
+            background: rgba(20, 20, 30, 0.6);
+            border: 1px solid rgba(120, 119, 198, 0.2);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .search-info-title {
+            color: #00d4ff;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .search-mode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .search-mode-card {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .search-mode-card h4 {
+            color: #00d4ff;
+            margin-bottom: 0.5rem;
+        }
+
+        .search-mode-card p {
+            color: #a0a6b0;
+            font-size: 0.9rem;
+        }
+
+        /* Results section */
+        .results-section {
+            margin-top: 3rem;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(120, 119, 198, 0.2);
+        }
+
+        .results-count {
+            font-size: 1.1rem;
+            color: #a0a6b0;
+        }
+
+        .search-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .results-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .result-card {
+            background: rgba(20, 20, 30, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(120, 119, 198, 0.2);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .result-card:hover {
+            transform: translateY(-2px);
+            border-color: #00d4ff;
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.1);
+        }
+
+        .result-type-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .result-type-exact {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+
+        .result-type-fuzzy {
+            background: rgba(255, 107, 157, 0.2);
+            color: #ff6b9d;
+        }
+
+        .result-type-bm25 {
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #00d4ff;
+            margin-right: 100px; /* Space for badge */
+        }
+
+        .result-definition {
+            color: #e0e6ed;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .result-snippet {
+            color: #a0a6b0;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .result-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(120, 119, 198, 0.1);
+        }
+
+        .result-score {
+            background: rgba(0, 212, 255, 0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-weight: 500;
+            color: #00d4ff;
+        }
+
+        .result-type-info {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .result-pos {
+            background: rgba(255, 107, 157, 0.2);
+            color: #ff6b9d;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+
+        .result-similarity {
+            background: rgba(120, 119, 198, 0.2);
+            color: #7c77c6;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+
+        .result-example {
+            background: rgba(120, 219, 255, 0.1);
+            border-left: 3px solid rgba(120, 219, 255, 0.5);
+            padding: 0.75rem;
+            margin-top: 1rem;
+            font-style: italic;
+            color: #a0a6b0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .result-full-content {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(120, 119, 198, 0.2);
+            color: #c0c6d0;
+            line-height: 1.6;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .result-full-content.expanded {
+            max-height: 1000px;
+        }
+
+        .expand-btn {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .expand-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+        }
+
+        /* Status messages */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #a0a6b0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-top: 2px solid #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #a0a6b0;
+            background: rgba(20, 20, 30, 0.6);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 119, 198, 0.3);
+        }
+
+        .no-results h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #e0e6ed;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 50, 50, 0.1);
+            border: 1px solid rgba(255, 50, 50, 0.3);
+            border-radius: 15px;
+            color: #ffaaaa;
+            margin-bottom: 2rem;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-info {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .search-title {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 2rem 1rem;
+            }
+
+            .results-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .search-stats {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+
+            .search-mode-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .result-title {
+                margin-right: 0;
+                margin-bottom: 2rem;
+            }
+
+            .result-type-badge {
+                position: static;
+                display: inline-block;
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Highlight search terms */
+        .highlight {
+            background: rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+            padding: 0.1rem 0.2rem;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+
+        /* Welcome message */
+        .welcome-section {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(20, 20, 30, 0.6);
+            border-radius: 15px;
+            border: 1px solid rgba(120, 119, 198, 0.3);
+        }
+
+        .welcome-section h3 {
+            color: #00d4ff;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-section p {
+            color: #a0a6b0;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .example-queries {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .example-query {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .example-query:hover {
+            background: rgba(0, 212, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* WordNet specific styles */
+        .wordnet-definitions {
+            margin-bottom: 1.5rem;
+        }
+
+        .definition-item {
+            margin-bottom: 1rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(120, 119, 198, 0.1);
+        }
+
+        .pos-tag {
+            display: inline-block;
+            background: rgba(124, 119, 198, 0.2);
+            color: #7c77c6;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .wordnet-examples,
+        .wordnet-synonyms,
+        .wordnet-antonyms {
+            margin-top: 1rem;
+        }
+
+        .wordnet-examples h4,
+        .wordnet-synonyms h4,
+        .wordnet-antonyms h4 {
+            color: #00d4ff;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .synonym-tags,
+        .antonym-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .synonym-tag,
+        .antonym-tag {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .synonym-tag:hover {
+            background: rgba(0, 212, 255, 0.2);
+        }
+
+        .antonym-tag {
+            background: rgba(255, 107, 157, 0.1);
+            border-color: rgba(255, 107, 157, 0.3);
+            color: #ff6b9d;
+        }
+
+        .antonym-tag:hover {
+            background: rgba(255, 107, 157, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    <div class="circuit-lines">
+        <div class="circuit-line"></div>
+        <div class="circuit-line"></div>
+        <div class="circuit-line"></div>
+        <div class="circuit-line"></div>
+    </div>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">TechWiki</div>
+            <div class="nav-info">
+                <div>Owner is Đạt</div>
+                <div class="search-mode-indicator" id="searchModeIndicator">Smart Search Ready</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="search-section">
+            <h1 class="search-title">Smart Search Engine</h1>
+            <p class="search-subtitle">Dictionary lookup • Spell correction • Semantic search </p>
+            
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Try: 'python', 'machine learning', or 'how to build neural networks'..." id="searchInput">
+                <div class="search-suggestions" id="suggestions"></div>
+            </div>
+        </section>
+
+        <section class="search-info-panel" id="searchInfoPanel">
+            <div class="search-info-title">🧠 How Smart Search Works</div>
+            <div class="search-mode-grid">
+                <div class="search-mode-card">
+                    <h4>1 Word</h4>
+                    <p>Exact dictionary lookup → Fuzzy search with spell correction</p>
+                </div>
+                <div class="search-mode-card">
+                    <h4>2 Words</h4>
+                    <p>Individual word lookup → Combined results → BM25 fallback</p>
+                </div>
+                <div class="search-mode-card">
+                    <h4>3+ Words</h4>
+                    <p>Advanced BM25 semantic search with cached models</p>
+                </div>
+            </div>
+        </section>
+
+        <div id="errorMessage" class="error-message" style="display: none;">
+            <h3>⚠️ Connection Error</h3>
+            <p>Unable to connect to the search backend. Please ensure the Flask server is running on port 5000.</p>
+        </div>
+
+        <section class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-header">
+                <div class="results-count" id="resultsCount">0 results found</div>
+                <div class="search-stats">
+                    <span id="searchTime">0ms</span>
+                    <span id="searchType">Unknown</span>
+                    <span id="wordCount">0 words</span>
+                </div>
+            </div>
+            <div class="results-grid" id="resultsGrid"></div>
+        </section>
+
+        <div class="loading" id="loading" style="display: none;">
+            <div class="loading-spinner"></div>
+            <div>Searching...</div>
+        </div>
+
+        <div class="no-results" id="noResults" style="display: none;">
+            <h3>No results found</h3>
+            <p>Try different keywords, check spelling, or use fewer words</p>
+        </div>
+
+        <div class="welcome-section" id="welcomeSection">
+            <h3>🚀 Welcome to Smart Search</h3>
+            <p>
+                This intelligent search engine adapts to your query type:<br>
+                Single words get dictionary definitions, phrases get fuzzy matching, and complex queries use advanced semantic search.
+            </p>
+            <div class="example-queries">
+                <span class="example-query" onclick="searchExample('python')">python</span>
+                <span class="example-query" onclick="searchExample('machine learning')">machine learning</span>
+                <span class="example-query" onclick="searchExample('how to build neural networks')">neural network algorithms</span>
+                <span class="example-query" onclick="searchExample('database')">database</span>
+                <span class="example-query" onclick="searchExample('artifical')">artifical (misspelled)</span>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Configuration
+        const API_BASE_URL = 'http://localhost:5000';
+        const DEBOUNCE_DELAY = 300;
+        
+        // DOM elements
+        const searchInput = document.getElementById('searchInput');
+        const suggestions = document.getElementById('suggestions');
+        const resultsSection = document.getElementById('resultsSection');
+        const resultsCount = document.getElementById('resultsCount');
+        const resultsGrid = document.getElementById('resultsGrid');
+        const loading = document.getElementById('loading');
+        const noResults = document.getElementById('noResults');
+        const errorMessage = document.getElementById('errorMessage');
+        const welcomeSection = document.getElementById('welcomeSection');
+        const searchInfoPanel = document.getElementById('searchInfoPanel');
+        const searchModeIndicator = document.getElementById('searchModeIndicator');
+        const searchTime = document.getElementById('searchTime');
+        const searchType = document.getElementById('searchType');
+        const wordCount = document.getElementById('wordCount');
+
+        let currentQuery = '';
+        let searchTimeout;
+        let suggestTimeout;
+        let expandedResults = new Set();
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkBackendConnection();
+            initializeEventListeners();
+        });
+
+        function initializeEventListeners() {
+            searchInput.addEventListener('input', handleInput);
+            searchInput.addEventListener('keydown', handleKeydown);
+            
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.search-container')) {
+                    suggestions.style.display = 'none';
+                }
+            });
+        }
+
+        function handleInput(e) {
+            const query = e.target.value.trim();
+            
+            clearTimeout(searchTimeout);
+            clearTimeout(suggestTimeout);
+            
+            if (query.length > 0) {
+                updateSearchMode(query);
+                
+                if (query.length > 1) {
+                    suggestTimeout = setTimeout(() => {
+                        fetchSuggestions(query);
+                    }, DEBOUNCE_DELAY);
+                }
+                
+                searchTimeout = setTimeout(() => {
+                    performSearch(query);
+                }, DEBOUNCE_DELAY);
+            } else {
+                hideSuggestions();
+                showWelcome();
+                searchModeIndicator.textContent = 'Smart Search Ready';
+            }
+        }
+
+        function handleKeydown(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                hideSuggestions();
+                performSearch(e.target.value.trim());
+            } else if (e.key === 'Escape') {
+                hideSuggestions();
+            }
+        }
+
+        function updateSearchMode(query) {
+            const words = query.split().length;
+            let modeText = 'Smart Search Ready';
+            
+            if (words === 1) {
+                modeText = 'Dictionary Mode';
+            } else if (words === 2) {
+                modeText = 'Multi-word Mode';
+            } else if (words > 2) {
+                modeText = 'Semantic Search';
+            }
+            
+            searchModeIndicator.textContent = modeText;
+        }
+
+        async function fetchSuggestions(prefix) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/suggest?prefix=${encodeURIComponent(prefix)}`);
+                if (!response.ok) throw new Error('Suggest API error');
+                
+                const suggestionWords = await response.json();
+                displaySuggestions(suggestionWords);
+                
+            } catch (error) {
+                console.error('Error fetching suggestions:', error);
+                hideSuggestions();
+            }
+        }
+
+        function displaySuggestions(suggestionWords) {
+            if (!suggestionWords || suggestionWords.length === 0) {
+                hideSuggestions();
+                return;
+            }
+
+            suggestions.innerHTML = suggestionWords.map(word => 
+                `<div class="suggestion-item" onclick="selectSuggestion('${word}')">${word}</div>`
+            ).join('');
+            
+            suggestions.style.display = 'block';
+        }
+
+        function selectSuggestion(word) {
+            searchInput.value = word;
+            hideSuggestions();
+            performSearch(word);
+        }
+
+        function hideSuggestions() {
+            suggestions.style.display = 'none';
+        }
+
+        async function performSearch(query) {
+            if (!query.trim() || query === currentQuery) return;
+            
+            currentQuery = query;
+            showLoading();
+            hideWelcome();
+            hideError();
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/search?query=${encodeURIComponent(query)}`);
+                if (!response.ok) throw new Error('Search API error');
+                
+                const data = await response.json();
+                displayResults(data);
+                
+            } catch (error) {
+                console.error('Error performing search:', error);
+                showError();
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function displayResults(data) {
+            if (data.error) {
+                showError(data.error);
+                return;
+            }
+
+            const results = data.results || [];
+            
+            // Update stats
+            resultsCount.textContent = `${results.length} results found`;
+            searchTime.textContent = `${data.search_time_ms || 0}ms`;
+            searchType.textContent = formatSearchType(data.search_type || 'unknown');
+            wordCount.textContent = `${data.word_count || 0} words`;
+            
+            if (results.length === 0) {
+                showNoResults();
+                return;
+            }
+
+            hideNoResults();
+            resultsSection.style.display = 'block';
+
+            resultsGrid.innerHTML = results.map(result => {
+                return createResultCard(result, data.search_type);
+            }).join('');
+        }
+
+        function createResultCard(result, searchType) {
+            const typeClass = `result-type-${result.search_type || searchType}`;
+            const typeBadge = formatSearchType(result.search_type || searchType);
+            
+            let content = '';
+            
+            if (result.search_type === 'wordnet') {
+                // WordNet result
+                content = `
+                    <h3 class="result-title">${highlightSearchTerms(result.word, currentQuery)}</h3>
+                    <div class="result-type-badge ${typeClass}">${typeBadge}</div>
+                    
+                    <div class="wordnet-definitions">
+                        ${result.definitions.map(def => `
+                            <div class="definition-item">
+                                <div class="pos-tag">${formatPOS(def.pos)}</div>
+                                <div class="result-definition">${highlightSearchTerms(def.definition, currentQuery)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    ${result.examples.length > 0 ? `
+                        <div class="wordnet-examples">
+                            <h4>Examples:</h4>
+                            ${result.examples.map(example => `
+                                <div class="result-example">"${example}"</div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+
+                    ${result.synonyms.length > 0 ? `
+                        <div class="wordnet-synonyms">
+                            <h4>Synonyms:</h4>
+                            <div class="synonym-tags">
+                                ${result.synonyms.map(syn => `
+                                    <span class="synonym-tag" onclick="searchExample('${syn}')">${syn}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${result.antonyms.length > 0 ? `
+                        <div class="wordnet-antonyms">
+                            <h4>Antonyms:</h4>
+                            <div class="antonym-tags">
+                                ${result.antonyms.map(ant => `
+                                    <span class="antonym-tag" onclick="searchExample('${ant}')">${ant}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <div class="result-meta">
+                        <div class="result-type-info">
+                            <span class="result-pos">WordNet</span>
+                        </div>
+                    </div>
+                `;
+            } else if (result.definition) {
+                // Dictionary result
+                content = `
+                    <h3 class="result-title">${highlightSearchTerms(result.word || result.title, currentQuery)}</h3>
+                    <div class="result-type-badge ${typeClass}">${typeBadge}</div>
+                    <div class="result-definition">${highlightSearchTerms(result.definition, currentQuery)}</div>
+                    ${result.example ? `<div class="result-example">"${result.example}"</div>` : ''}
+                    <div class="result-meta">
+                        <div class="result-type-info">
+                            ${result.type ? `<span class="result-pos">${result.type}</span>` : ''}
+                            ${result.similarity_score ? `<span class="result-similarity">${Math.round(result.similarity_score * 100)}% match</span>` : ''}
+                        </div>
+                        <div>Dictionary Entry</div>
+                    </div>
+                `;
+            } else {
+                // BM25 result
+                content = `
+                    <h3 class="result-title">${highlightSearchTerms(result.title, currentQuery)}</h3>
+                    <div class="result-type-badge ${typeClass}">${typeBadge}</div>
+                    <div class="result-snippet">${highlightSearchTerms(result.snippet || result.content, currentQuery)}</div>
+                    <button class="expand-btn" onclick="toggleExpand('${result.id}')">Show Full Content</button>
+                    <div class="result-full-content" id="content-${result.id}">
+                        ${highlightSearchTerms(result.content || result.snippet, currentQuery)}
+                    </div>
+                    <div class="result-meta">
+                        <span>Document ID: ${result.id}</span>
+                        ${result.score ? `<span class="result-score">Score: ${(result.score * 100).toFixed(1)}%</span>` : ''}
+                    </div>
+                `;
+            }
+            
+            return `<div class="result-card">${content}</div>`;
+        }
+
+        // Add helper function to format part of speech tags
+        function formatPOS(pos) {
+            const posMap = {
+                'n': 'Noun',
+                'v': 'Verb',
+                'a': 'Adjective',
+                'r': 'Adverb',
+                's': 'Adjective Satellite'
+            };
+            return posMap[pos] || pos;
+        }
+
+        function formatSearchType(type) {
+            const typeMap = {
+                'exact': 'Exact Match',
+                'exact_dictionary': 'Dictionary',
+                'fuzzy': 'Fuzzy Match',
+                'fuzzy_dictionary': 'Spell Check',
+                'dictionary_multi': 'Multi-word Dict',
+                'bm25': 'Semantic Search',
+                'bm25_fallback': 'BM25 Fallback'
+            };
+            return typeMap[type] || type;
+        }
+
+        function highlightSearchTerms(text, query) {
+            if (!query || !text) return text;
+            
+            const queryTerms = query.toLowerCase().split(/\s+/).filter(term => term.length > 1);
+            let highlightedText = text;
+            
+            queryTerms.forEach(term => {
+                const regex = new RegExp(`(${escapeRegex(term)})`, 'gi');
+                highlightedText = highlightedText.replace(regex, '<span class="highlight">$1</span>');
+            });
+            
+            return highlightedText;
+        }
+
+        function escapeRegex(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function toggleExpand(resultId) {
+            const content = document.getElementById(`content-${resultId}`);
+            const btn = content.previousElementSibling;
+            
+            if (expandedResults.has(resultId)) {
+                content.classList.remove('expanded');
+                btn.textContent = 'Show Full Content';
+                expandedResults.delete(resultId);
+            } else {
+                content.classList.add('expanded');
+                btn.textContent = 'Hide Full Content';
+                expandedResults.add(resultId);
+            }
+        }
+
+        function showLoading() {
+            loading.style.display = 'flex';
+        }
+
+        function hideLoading() {
+            loading.style.display = 'none';
+        }
+
+        function showError(message = null) {
+            if (message) {
+                errorMessage.querySelector('p').textContent = message;
+            }
+            errorMessage.style.display = 'block';
+        }
+
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+
+        function showNoResults() {
+            noResults.style.display = 'block';
+            resultsSection.style.display = 'none';
+        }
+
+        function hideNoResults() {
+            noResults.style.display = 'none';
+        }
+
+        function showWelcome() {
+            welcomeSection.style.display = 'block';
+            searchInfoPanel.style.display = 'block';
+            resultsSection.style.display = 'none';
+        }
+
+        function hideWelcome() {
+            welcomeSection.style.display = 'none';
+            searchInfoPanel.style.display = 'none';
+        }
+
+        function searchExample(query) {
+            searchInput.value = query;
+            performSearch(query);
+            updateSearchMode(query);
+        }
+
+        async function checkBackendConnection() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Backend connected:', data);
+                    hideError();
+                } else {
+                    throw new Error('Health check failed');
+                }
+            } catch (error) {
+                console.warn('Backend not available:', error);
+                showError();
+            }
+        }
+    </script>
+</body>
+</html>
