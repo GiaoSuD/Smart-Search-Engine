@@ -699,19 +699,25 @@ class SmartSearchEngine:
         suggestions.extend(sorted(vocab_matches)[:limit//2])
         
         return suggestions[:limit]
-
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, 'data')
 # Initialize search engine with WordNet check
 search_engine = SmartSearchEngine()
 search_engine.use_wordnet = initialize_nltk()
 
-# Load data with logging
-print("Loading dictionary and CSV data...")
-search_engine.load_dictionary('dictionary.json')
-search_engine.load_csv_documents(r'D:\TruyVan\project\backend\merged_file_unique.csv')
-print("Initializing BM25 model...")
-search_engine.initialize_bm25()
-print("Search engine initialization complete")
-
+print("Loading cached search index...")
+index_path = os.path.join(DATA_DIR, 'search_index.pkl')
+if os.path.exists(index_path):
+    with open(index_path, 'rb') as f:
+        index_data = pickle.load(f)
+        search_engine.bm25 = index_data['bm25']
+        search_engine.csv_documents = index_data['documents']
+        search_engine.preprocessed_docs = index_data['preprocessed_docs']
+        search_engine.vocabulary = index_data['vocabulary']
+    print(f"Loaded index with {len(search_engine.csv_documents)} documents")
+else:
+    print("Error: Search index not found. Please run create_index.py first")
+    raise FileNotFoundError("Search index not found")
 @app.route('/search', methods=['GET'])
 def search():
     """Main search endpoint"""
