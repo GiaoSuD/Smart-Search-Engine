@@ -515,3 +515,28 @@ class BM25SearchEngine:
                 'search_time_ms': search_time,
                 'total_results': len(bm25_results)
             }
+    
+    def load_index(self, index_file=None):
+        """Load existing search index"""
+
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        DATA_DIR = os.path.join(BASE_DIR, 'data')
+    
+        if index_file is None:
+            index_file = os.path.join(DATA_DIR, 'search_index.pkl')
+
+        try:
+            print(f"Loading search index from {index_file}...")
+            with open(index_file, 'rb') as f:
+                index_data = pickle.load(f)
+            
+            self.bm25 = index_data['bm25']
+            self.documents = index_data['documents']
+            self.preprocessed_docs = index_data['preprocessed_docs']
+            self.vocabulary = index_data['vocabulary']
+        
+            print(f"Loaded index with {len(self.documents)} documents")
+            return True
+        except Exception as e:
+            print(f"Error loading index: {e}")
+            return False
