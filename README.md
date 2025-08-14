@@ -64,11 +64,11 @@ nltk.download('omw-1.4')
 ---
 
 ## ▶️ Usage
-1. **Create pkl file **
+1. **Create Pkl File**
 ```bash
 python create_index.py 
 ```
-remember to change path to you csv file 
+
 2. **Start the backend**
 ```bash
 python app.py
@@ -95,7 +95,7 @@ The dataset comes from **Simple English Wikipedia**, processed into:
 - `merged_file_unique.csv` – content for BM25 search.
 - `bm25_model.pkl` – pre-built BM25 index for faster search.
 ## Note
-- If you clone this repo, pls change the path to csv file on you computer to run it work, the path in app.py.
+- If you clone this repo, pls change the path to csv file on your computer to run it work, the path in app.py.
 - If you run the app.py for the first time, it's may take a while (about 2-3m) to run and create bm25_model.pkl because the data file is heavy 
-- Check all path if you code not run.
+- Check all path if your code not run.
 - Check the csv file structure.
