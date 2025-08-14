@@ -14,6 +14,7 @@ The system automatically classifies queries into three modes:
 .
 ├── app.py                # Flask backend API
 ├── search_engine.py      # Search engine logic (dictionary + BM25)
+├── create_index.py       # apply bm25 to csv and create pkl file 
 ├── index.html            # User interface (frontend)
 ├── requirments.txt       # Python dependencies
 ├── Simple_wiki_data.csv  # Search dataset (Simple English Wikipedia) (i zipped it)
@@ -63,13 +64,18 @@ nltk.download('omw-1.4')
 ---
 
 ## ▶️ Usage
-1. **Start the backend**
+1. **Create pkl file **
+```bash
+python create_index.py 
+```
+remember to change path to you csv file 
+2. **Start the backend**
 ```bash
 python app.py
 ```
 Backend will run at: `http://127.0.0.1:5000`
 
-2. **Open the frontend**  
+3. **Open the frontend**  
 Open `index.html` in your browser.
 
 ---
@@ -91,3 +97,5 @@ The dataset comes from **Simple English Wikipedia**, processed into:
 ## Note
 - If you clone this repo, pls change the path to csv file on you computer to run it work, the path in app.py.
 - If you run the app.py for the first time, it's may take a while (about 2-3m) to run and create bm25_model.pkl because the data file is heavy 
+- Check all path if you code not run.
+- Check the csv file structure.
